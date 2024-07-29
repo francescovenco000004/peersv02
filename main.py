@@ -31,6 +31,7 @@ def students():
         
         # Load the CSV content into a DataFrame
         df = pd.read_csv(csv_file)
+        print(df.head())
         
         # Check if the DataFrame is empty
         if df.empty:
