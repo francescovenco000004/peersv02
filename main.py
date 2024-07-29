@@ -1,3 +1,26 @@
+# Import necessary libraries
+import os
+from flask import Flask, Response, request, jsonify
+import pandas as pd
+from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline
+from sentence_transformers import SentenceTransformer, util
+import io
+import joblib
+
+app = Flask(__name__)
+
+# Load models and tokenizers
+qa_model_name = "deepset/roberta-base-squad2"
+qa_model = AutoModelForQuestionAnswering.from_pretrained(qa_model_name)
+qa_tokenizer = AutoTokenizer.from_pretrained(qa_model_name)
+qa_pipeline = pipeline('question-answering', model=qa_model, tokenizer=qa_tokenizer)
+
+sbert_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+
+# Load the trained regression model
+regression_model = joblib.load('tree_regressor_model.joblib')
+
+
 @app.route('/api/v1.0/students', methods=['POST'])
 def students():
     try:
