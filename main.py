@@ -23,8 +23,19 @@ regression_model = joblib.load('tree_regressor_model.joblib')
 @app.route('/api/v1.0/students', methods=['POST'])
 def students():
     try:
-        # Read the CSV content from the request body
-        csv_content = request.data.decode('utf-8')
+        # Check if the request contains a file part
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+        
+        # Get the uploaded file
+        file = request.files['file']
+        
+        # Check if a file was actually uploaded
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+        
+        # Read the CSV content from the file
+        csv_content = file.read().decode('utf-8')
         
         # Use StringIO to simulate a file object for pandas
         csv_file = io.StringIO(csv_content)
