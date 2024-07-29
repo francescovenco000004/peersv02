@@ -20,7 +20,6 @@ sbert_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 # Load the trained regression model
 regression_model = joblib.load('tree_regressor_model.joblib')
 
-
 @app.route('/api/v1.0/students', methods=['POST'])
 def students():
     try:
@@ -30,20 +29,12 @@ def students():
         # Use StringIO to simulate a file object for pandas
         csv_file = io.StringIO(csv_content)
         
-        # Attempt to load the CSV content into a DataFrame
-        try:
-            df = pd.read_csv(csv_file)
-        except pd.errors.ParserError as e:
-            return jsonify({'error': f'CSV parsing error: {str(e)}'}), 400
+        # Load the CSV content into a DataFrame
+        df = pd.read_csv(csv_file)
         
         # Check if the DataFrame is empty
         if df.empty:
             return jsonify({'error': 'Empty CSV data'}), 400
-        
-        # Ensure expected columns are present
-        required_columns = {'company name', 'description'}
-        if not required_columns.issubset(df.columns):
-            return jsonify({'error': f'Missing columns in CSV. Required columns are: {required_columns}'}), 400
         
         # Define the list of questions
         questions = [
@@ -141,6 +132,15 @@ def students():
         # Return the result as JSON
         return jsonify(result)
 
+    
     except Exception as e:
         # Handle unexpected errors
         return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    # for deployment
+    # to make it work for both production and development
+    port = int(os.environ.get("PORT", 8080))
+    app.run(debug=True, host='0.0.0.0', port=port)
+
+
